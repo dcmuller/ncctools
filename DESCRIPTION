@@ -5,7 +5,8 @@ Version: 0.1
 Date: 2013-08-02
 Author: David C Muller
 Maintainer: David C Muller <davidmull@gmail.com>
-Description: Tools for creating and analysing incidence density sampled nested case-control data
+Description: Tools for creating and analysing incidence density sampled nested
+    case-control data
 License: BSD 2-clause license
 Collate:
     'ncc_sample.r'

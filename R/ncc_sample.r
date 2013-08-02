@@ -35,9 +35,9 @@
 #' \code{ncc_sample} splits tied failure times at random, whereas \code{ccwc}
 #' preserves the ties and returns a multi-case case-control set.
 #' 
-#' Control selection is performed using the \code{link{sample}} function. It is
-#' therefore important to set seed for the random number generator 
-#' (\code{linl{set.seed}}) to ensure reproducibility.
+#' Control selection is performed using the \code{\link{sample}} function. It is
+#' therefore important to set the seed for the pseudo random number generator 
+#' (\code{\link{set.seed}}) to ensure reproducibility.
 #' 
 #' @return
 #' A \code{data.frame} comprising:
@@ -50,17 +50,17 @@
 #' \item{ncc_pr}{the probability of being selected in the nested 
 #' case-control sample}
 #' 
+#' followed by the variables specified in the \code{match} and \code{include} 
+#' lists.
+#' 
 #' @author David C Muller
 #' 
 #' @references
-#' Samuelsen, S. O. (1997). A psudolikelihood approach to analysis of nested 
-#' case-control studies. Biometrika, 84(2), 379–394. doi:10.1093/biomet/84.2.379
+#' Samuelsen S. O. (1997). A psudolikelihood approach to analysis of nested 
+#' case-control studies. Biometrika, 84(2), 379-394. doi:10.1093/biomet/84.2.379
 #' 
 #' @export
 #' 
-
-
-
 ncc_sample <- function(entry = 0, exit, fail, origin = 0, controls = 1, 
                        match = list(), include = list(), data = NULL, 
                        silent = FALSE) {
