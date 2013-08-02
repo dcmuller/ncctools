@@ -56,6 +56,8 @@
 #' Samuelsen, S. O. (1997). A psudolikelihood approach to analysis of nested 
 #' case-control studies. Biometrika, 84(2), 379–394. doi:10.1093/biomet/84.2.379
 #' 
+#' @export
+#' 
 
 
 

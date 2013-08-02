@@ -1,9 +1,11 @@
 Package: ncctools
 Type: Package
-Title: What the package does (short line)
-Version: 1.0
-Date: 2013-07-31
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Title: Tools for nested case-control data
+Version: 0.1
+Date: 2013-08-02
+Author: David C Muller
+Maintainer: David C Muller <davidmull@gmail.com>
+Description: Tools for creating and analysing incidence density sampled nested case-control data
+License: BSD 2-clause license
+Collate:
+    'ncc_sample.r'
