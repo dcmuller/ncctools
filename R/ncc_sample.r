@@ -116,14 +116,8 @@ data$ncc_id <- ncc_id
   if (length(match) > 0) {
     grp <- as.numeric(factor(do.call(paste0, match)))
   }
-  nn <- (1 + controls) * sum(fail != 0)
-  pr <- numeric(nn)
-  sr <- numeric(nn)
-  tr <- vector("numeric", nn)
-  fr <- numeric(nn)
-  nn <- 0
   if (!silent) {
-    cat("\nGenerating risk sets: ")
+    cat("\nGenerating risk sets:\n")
   }
   set <- 0
   nomatch <- 0
@@ -133,6 +127,7 @@ data$ncc_id <- ncc_id
   gresult <- vector("list", length(fg))
   # index for groups
   gii <- 0
+  # iterator for displaying dots
   for (g in fg) {
     gii <- gii + 1
     ft <- unique(t_exit[(grp == g) & (fail != 0)])
@@ -151,10 +146,11 @@ data$ncc_id <- ncc_id
       sresult <- vector("list", ncase)
       case_index <- cumsum(case)*case
       for (tjj in 1:ncase) {
-        if (!silent) {
-          cat(".")
-        }
         set <- set + 1
+        if (!silent) {
+          dots <- ifelse((set %% 50 == 0), ". 50\n", ".")
+          cat(dots)
+        }
         failure <- case & case_index==tjj
         noncase <- (grp == g) & (t_entry <= t_end) & (t_exit >= t_end) & !failure
         n_eligible <- sum(noncase)
@@ -192,9 +188,16 @@ data$ncc_id <- ncc_id
   
   
 # sample controls from risk sets  
+  if (!silent) {
+    cat("\nSampling from risk sets:\n")
+  }
   nsets <- max(tsplit$ncc_set)
   samp <- vector("list", nsets)
   for (s in 1:nsets) {
+  if (!silent) {
+    dots <- ifelse((s %% 50 == 0), ". 50\n", ".")
+    cat(dots)
+  }
     riskset <-tsplit[tsplit$ncc_set==s, ]
     ncase <- sum(riskset$ncc_fail)
     nelig <- sum(!riskset$ncc_fail)
