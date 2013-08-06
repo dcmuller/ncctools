@@ -155,20 +155,28 @@ data$ncc_id <- ncc_id
         noncase <- (grp == g) & (t_entry <= t_end) & (t_exit >= t_end) & !failure
         n_eligible <- sum(noncase)
         ineligible <- !failure & !noncase
-        df <- data.frame(ncc_id   = ncc_id, 
-                         ncc_set  = set, 
-                         ncc_fail = failure, 
-                         nfail    = rep(sum(failure), length(failure)),
-                         ncc_elig_co = rep(n_eligible, length(failure)), 
-                         ncc_time     = rep(t_end, length(failure)))
+        df <- cbind(ncc_id, 
+                    set, 
+                    failure, 
+                    rep(sum(failure), length(failure)),
+                    rep(n_eligible, length(failure)),
+                    rep(t_end, length(failure)))
+        colnames(df) <- c("ncc_id", "ncc_set", "ncc_fail", 
+                          "nfail", "ncc_elig_co", "ncc_time")
+#         df <- data.frame(ncc_id   = ncc_id, 
+#                          ncc_set  = set, 
+#                          ncc_fail = failure, 
+#                          nfail    = rep(sum(failure), length(failure)),
+#                          ncc_elig_co = rep(n_eligible, length(failure)), 
+#                          ncc_time     = rep(t_end, length(failure)))
         sresult[[tjj]] <- df[!ineligible, ]
       }
-      tresult[[tii]] <- do.call(rbind.data.frame, sresult)
+      tresult[[tii]] <- do.call("rbind", sresult)
     }
-    gresult[[gii]] <- do.call(rbind.data.frame, tresult)
+    gresult[[gii]] <- do.call("rbind", tresult)
     rm(tresult)
   }
-  tsplit <- do.call(rbind.data.frame, gresult)
+  tsplit <- as.data.frame(do.call("rbind", gresult))
 # Calculate probability of inclusion 
 # (Samuelsen, Biometrika, 1997, 84(2) p379)
   pr_not <- 1 - ((tsplit$nfail * controls) / tsplit$ncc_elig_co)
@@ -185,7 +193,6 @@ data$ncc_id <- ncc_id
   tsplit$ncc_pr[tsplit$ncc_pr > 1] <- 1
   # we no longer need the number of failures per set
   tsplit$nfail <- NULL
-  
   
 # sample controls from risk sets  
   if (!silent) {
@@ -218,7 +225,7 @@ data$ncc_id <- ncc_id
       samp[[s]] <- riskset[samp_index, ]
     }
   }
-  ncc_frame <- do.call(rbind.data.frame, samp)  
+  ncc_frame <- do.call("rbind.data.frame", samp)  
   # coerce failure flag to numeric 
   # (logical var for case status might confuse people)
   ncc_frame$ncc_fail <- as.numeric(ncc_frame$ncc_fail)
