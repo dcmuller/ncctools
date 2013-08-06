@@ -41,8 +41,8 @@
 #' 
 #' @return
 #' A \code{data.frame} comprising:
-#' \item{ncc_id}{a unique individual identifier}
 #' \item{ncc_set}{a case-control set identifier}
+#' \item{ncc_id}{a unique individual identifier}
 #' \item{ncc_fail}{case identifier (0=control, 1=case)}
 #' \item{ncc_elig_co}{a count of the number of controls eligible for selection
 #' in the set}
@@ -64,6 +64,7 @@
 ncc_sample <- function(entry = 0, exit, fail, origin = 0, controls = 1, 
                        match = list(), include = list(), data = NULL, 
                        silent = FALSE) {
+  require(data.table)
   entry <- eval(substitute(entry), data)
   exit <- eval(substitute(exit), data)
   fail <- eval(substitute(fail), data)
@@ -72,7 +73,8 @@ ncc_sample <- function(entry = 0, exit, fail, origin = 0, controls = 1,
 # individual id for identifying sets of split records
   ncc_id <- 1:n
 # add this id to the supplied data frame for later merging
-data$ncc_id <- ncc_id
+  data <- data.table(data)
+  data[, "ncc_id" := ncc_id, with=FALSE]
   if (length(exit) != n) {
     stop("All vectors must have length")
   }
@@ -119,15 +121,12 @@ data$ncc_id <- ncc_id
   if (!silent) {
     cat("\nGenerating risk sets:\n")
   }
-  set <- 0
-  nomatch <- 0
-  incomplete <- 0
-  ties <- 0 
   fg <- unique(grp[fail != 0])
   gresult <- vector("list", length(fg))
   # index for groups
   gii <- 0
-  # iterator for displaying dots
+  set <- 0
+  ties <- 0
   for (g in fg) {
     gii <- gii + 1
     ft <- unique(t_exit[(grp == g) & (fail != 0)])
@@ -155,84 +154,71 @@ data$ncc_id <- ncc_id
         noncase <- (grp == g) & (t_entry <= t_end) & (t_exit >= t_end) & !failure
         n_eligible <- sum(noncase)
         ineligible <- !failure & !noncase
-        df <- cbind(ncc_id, 
-                    set, 
-                    failure, 
-                    rep(sum(failure), length(failure)),
-                    rep(n_eligible, length(failure)),
-                    rep(t_end, length(failure)))
-        colnames(df) <- c("ncc_id", "ncc_set", "ncc_fail", 
-                          "nfail", "ncc_elig_co", "ncc_time")
-#         df <- data.frame(ncc_id   = ncc_id, 
-#                          ncc_set  = set, 
-#                          ncc_fail = failure, 
-#                          nfail    = rep(sum(failure), length(failure)),
-#                          ncc_elig_co = rep(n_eligible, length(failure)), 
-#                          ncc_time     = rep(t_end, length(failure)))
+        df <- data.frame(ncc_id   = ncc_id, 
+                         ncc_set  = set, 
+                         ncc_fail = failure, 
+                         nfail    = rep(sum(failure), length(failure)),
+                         ncc_elig_co = rep(n_eligible, length(failure)), 
+                         ncc_time     = rep(t_end, length(failure)),
+                         ineligible   = ineligible)
         sresult[[tjj]] <- df[!ineligible, ]
       }
-      tresult[[tii]] <- do.call("rbind", sresult)
+      tresult[[tii]] <- rbindlist(sresult)
     }
-    gresult[[gii]] <- do.call("rbind", tresult)
+    gresult[[gii]] <- rbindlist(tresult)
     rm(tresult)
   }
-  tsplit <- as.data.frame(do.call("rbind", gresult))
+  tsplit <- rbindlist(gresult)
+  
 # Calculate probability of inclusion 
 # (Samuelsen, Biometrika, 1997, 84(2) p379)
-  pr_not <- 1 - ((tsplit$nfail * controls) / tsplit$ncc_elig_co)
-  product <- aggregate(pr_not, by = list(tsplit$ncc_id), prod)
-  names(product) <- c("ncc_id", "prod_pr_not")
-  pr <- data.frame(product["ncc_id"], product["prod_pr_not"])
-  pr$ncc_pr <- 1 - pr$prod_pr_not
-  pr$prod_pr_not <- NULL
-  tsplit <- merge(tsplit, pr, sort = FALSE)
+  tsplit[, "pr_not" := 1 - ((nfail * controls) / ncc_elig_co)]
+  tsplit[, "ncc_pr" := 1- prod(pr_not), by=ncc_id]
+  tsplit[, "pr_not" := NULL]
 # cases have probability of inclusion of 1
-  tsplit$ncc_pr[tsplit$ncc_fail==TRUE] <- 1
-# if risk sets are smaller than requested number of cases, the calculated
+  tsplit[ncc_fail==TRUE, ncc_pr := 1]
+  # if risk sets are smaller than requested number of cases, the calculated
 # probability will be greater than 1. The correct value is 1.
-  tsplit$ncc_pr[tsplit$ncc_pr > 1] <- 1
+  tsplit[ncc_pr > 1, ncc_pr := 1]
   # we no longer need the number of failures per set
-  tsplit$nfail <- NULL
+  tsplit[, nfail := NULL] 
   
 # sample controls from risk sets  
   if (!silent) {
     cat("\nSampling from risk sets:\n")
   }
-  nsets <- max(tsplit$ncc_set)
-  samp <- vector("list", nsets)
-  for (s in 1:nsets) {
-  if (!silent) {
-    dots <- ifelse((s %% 50 == 0), ". 50\n", ".")
-    cat(dots)
-  }
-    riskset <-tsplit[tsplit$ncc_set==s, ]
-    ncase <- sum(riskset$ncc_fail)
-    nelig <- sum(!riskset$ncc_fail)
-    ncont <- controls * ncase
-    if (nelig < ncont) {
-      ncont <- nelig
-      if (ncont > 0) {
-        incomplete <- incomplete + 1
-      }
-    }
-    if (ncont == 0) {
-      nomatch <- nomatch + ncase
-    }
-    else {
-      co_samp <- sample((1:nrow(riskset))[!riskset$ncc_fail], ncont)
-      ca_samp <- (1:nrow(riskset))[riskset$ncc_fail]
-      samp_index <- c(ca_samp, co_samp)
-      samp[[s]] <- riskset[samp_index, ]
-    }
-  }
-  ncc_frame <- do.call("rbind.data.frame", samp)  
+#   browser()
+  tsplit[, "r1" := runif(nrow(tsplit))]
+  tsplit[, "r2" := runif(nrow(tsplit))]
+  tsplit[, ncc_no_fail := !ncc_fail]
+  setkey(tsplit, ncc_set, ncc_no_fail, r1, r2)
+  # calculate conditions that should trigger warnings (incomplete sets, etc)
+  tsplit[, c("nca", "nel") := list(nca = sum(ncc_fail),
+                                   nel = sum(!ncc_fail)),
+         by = ncc_set]
+  tsplit[, nco := controls*nca]
+  incomplete <- sum(tsplit[, sum(nel < nco), by = ncc_set][,V1]>0)
+  nomatch <- sum(tsplit[, sum(nel == 0), by = ncc_set][,V1]>0)
+  ncc_frame <- tsplit[, 
+                 head(.SD, nca + nco), 
+                 by = list(ncc_set)]
+  
   # coerce failure flag to numeric 
   # (logical var for case status might confuse people)
-  ncc_frame$ncc_fail <- as.numeric(ncc_frame$ncc_fail)
-  res <- merge(ncc_frame, data, by="ncc_id")
-  res <- res[, c(names(ncc_frame), match_names, inc_names)]
-  res <- res[order(res$ncc_set,res$ncc_fail), ]
-  row.names(res) <- 1:nrow(res)
+  ncc_frame[, ncc_fail := as.numeric(ncc_fail)]
+  # get rid of the interim variables
+  ncc_frame[, c("ncc_elig_co", "r1", "r2", "ncc_no_fail", 
+                "nca", "nel", "nco") := NULL]
+  
+  # merge ncc frame with original data
+  setkey(ncc_frame, ncc_id)
+  setkey(data, ncc_id)
+  res <- data[ncc_frame]
+  res <- res[, c(names(ncc_frame), match_names, inc_names), with=FALSE]
+  res <- res[order(ncc_set,-ncc_fail), ]
+  setkey(res, ncc_set)
+  
+  # display warnings and return the frame
   if (incomplete > 0) {
     warning(paste(incomplete, "case-control sets are incomplete"))
   }
@@ -244,6 +230,6 @@ data$ncc_id <- ncc_id
                   ifelse(ties == 1, "set of", "sets of"),
                   "tied failure times"))
   }
-  return(data.frame(res))
+  return(res)
 }
   
