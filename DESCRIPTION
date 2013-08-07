@@ -14,6 +14,6 @@ Suggests:
     Epi
 Imports:
     data.table (>= 1.8.8)
-License: BSD 2-clause license
+License: BSD 
 Collate:
     'ncc_sample.r'
