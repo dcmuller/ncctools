@@ -59,12 +59,12 @@
 #' Samuelsen S. O. (1997). A psudolikelihood approach to analysis of nested 
 #' case-control studies. Biometrika, 84(2), 379-394. doi:10.1093/biomet/84.2.379
 #' 
+#' @import data.table
 #' @export
 #' 
 ncc_sample <- function(entry = 0, exit, fail, origin = 0, controls = 1, 
                        match = list(), include = list(), data = NULL, 
                        silent = FALSE) {
-  require(data.table)
   entry <- eval(substitute(entry), data)
   exit <- eval(substitute(exit), data)
   fail <- eval(substitute(fail), data)
