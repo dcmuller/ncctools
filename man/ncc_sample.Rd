@@ -28,10 +28,12 @@
   dataset to be carried accross the the nested case-control
   dataset}
 
-  \item{silent}{if \code{FALSE}, echoes a fullstop to the
-  screen as each risk set is generated, and as each
-  case-control set is sampled. If TRUE, suppresses output
-  to the terminal.}
+  \item{data}{a \code{\link{data.frame}} which contains the
+  follow-up, matching, and included variables.}
+
+  \item{silent}{if \code{FALSE}, provides entertainment by
+  echoing a fullstop to the screen as each risk set is
+  generated. If TRUE, output to the console is suppressed.}
 }
 \value{
   A \code{data.frame} comprising: \item{ncc_set}{a
@@ -75,9 +77,9 @@
   whereas \code{ccwc} preserves the ties and returns a
   multi-case case-control set.
 
-  Control selection is performed using the
-  \code{\link{sample}} function. It is therefore important
-  to set the seed for the pseudo random number generator
+  Random sampling of controls within risk sets is performed
+  using \R's pseudo-random number facilities. It is
+  therefore important to set the seed
   (\code{\link{set.seed}}) to ensure reproducibility.
 }
 \author{
