@@ -1,7 +1,7 @@
 Package: ncctools
 Type: Package
 Title: Tools for nested case-control data
-Version: 0.1
+Version: 0.2
 Date: 2013-08-02
 Author: David C Muller
 Maintainer: David C Muller <davidmull@gmail.com>
