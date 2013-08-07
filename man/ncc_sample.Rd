@@ -34,11 +34,11 @@
   to the terminal.}
 }
 \value{
-  A \code{data.frame} comprising: \item{ncc_id}{a unique
-  individual identifier} \item{ncc_set}{a case-control set
-  identifier} \item{ncc_fail}{case identifier (0=control,
-  1=case)} \item{ncc_elig_co}{a count of the number of
-  controls eligible for selection in the set}
+  A \code{data.frame} comprising: \item{ncc_set}{a
+  case-control set identifier} \item{ncc_id}{a unique
+  individual identifier} \item{ncc_fail}{case identifier
+  (0=control, 1=case)} \item{ncc_elig_co}{a count of the
+  number of controls eligible for selection in the set}
   \item{ncc_time}{failure time of the case in the set}
   \item{ncc_pr}{the probability of being selected in the
   nested case-control sample}

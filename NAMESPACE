@@ -1,1 +1,2 @@
 export(ncc_sample)
+import(data.table)
