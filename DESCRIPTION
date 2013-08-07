@@ -7,6 +7,13 @@ Author: David C Muller
 Maintainer: David C Muller <davidmull@gmail.com>
 Description: Tools for creating and analysing incidence density sampled nested
     case-control data
+Depends:
+    R (>= 3.0.1)
+Suggests:
+    survival,
+    Epi
+Imports:
+    data.table (>= 1.8.8)
 License: BSD 2-clause license
 Collate:
     'ncc_sample.r'
