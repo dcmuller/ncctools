@@ -21,6 +21,9 @@
 #' accross the the nested case-control dataset
 #' @param data a \code{\link{data.frame}} which contains the follow-up, 
 #' matching, and included variables.
+#' @param keep_all if \code{TRUE}, does not sample from the risk sets, but 
+#' returns the probability of selection for each observation that is eligible 
+#' to be selected for any case in \code{data}. Defaults to \code{FALSE}.
 #' @param silent if \code{FALSE}, provides entertainment by echoing a fullstop 
 #' to the screen as each risk set is generated. If TRUE, output to the
 #' console is suppressed.
@@ -66,7 +69,7 @@
 #' 
 ncc_sample <- function(entry = 0, exit, fail, origin = 0, controls = 1, 
                        match = list(), include = list(), data = NULL, 
-                       silent = FALSE) {
+                       keep_all = FALSE, silent = FALSE) {
   entry <- eval(substitute(entry), data)
   exit <- eval(substitute(exit), data)
   fail <- eval(substitute(fail), data)
@@ -201,9 +204,16 @@ ncc_sample <- function(entry = 0, exit, fail, origin = 0, controls = 1,
   tsplit[, nco := controls*nca]
   incomplete <- sum(tsplit[, sum(nel < nco), by = ncc_set][,V1]>0)
   nomatch <- sum(tsplit[, sum(nel == 0), by = ncc_set][,V1]>0)
+  # return either the whole dataset (one record per person), or
+  # just the ncc sample, depending on option keep_all
+  if (!keep_all) {
   ncc_frame <- tsplit[, 
                  head(.SD, nca + nco), 
                  by = list(ncc_set)]
+  }
+  else {
+    ncc_frame <- tsplit[, head(.SD, 1), by = list(ncc_id)]
+  }
   
   # coerce failure flag to numeric 
   # (logical var for case status might confuse people)

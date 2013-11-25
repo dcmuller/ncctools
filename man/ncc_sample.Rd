@@ -4,7 +4,7 @@
 \usage{
   ncc_sample(entry = 0, exit, fail, origin = 0,
     controls = 1, match = list(), include = list(),
-    data = NULL, silent = FALSE)
+    data = NULL, keep_all = FALSE, silent = FALSE)
 }
 \arguments{
   \item{entry}{time of entry to follow-up}
@@ -30,6 +30,11 @@
 
   \item{data}{a \code{\link{data.frame}} which contains the
   follow-up, matching, and included variables.}
+
+  \item{keep_all}{if \code{TRUE}, does not sample from the
+  risk sets, but returns the probability of selection for
+  each observation that is eligible to be selected for any
+  case in \code{data}. Defaults to \code{FALSE}.}
 
   \item{silent}{if \code{FALSE}, provides entertainment by
   echoing a fullstop to the screen as each risk set is
