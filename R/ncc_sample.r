@@ -208,7 +208,7 @@ ncc_sample <- function(entry = 0, exit, fail, origin = 0, controls = 1,
   # just the ncc sample, depending on option keep_all
   if (!keep_all) {
   ncc_frame <- tsplit[, 
-                 head(.SD, nca + nco), 
+                 head(.SD, nca[1] + nco[1]), 
                  by = list(ncc_set)]
   }
   else {
