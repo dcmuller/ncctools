@@ -180,13 +180,14 @@ ncc_sample <- function(entry = 0, exit, fail, origin = 0, controls = 1,
   tsplit[, "pr_not" := 1 - ((nfail * controls) / ncc_elig_co)]
   tsplit[, "ncc_pr" := 1- prod(pr_not), by=ncc_id]
   tsplit[, "pr_not" := NULL]
-# cases have probability of inclusion of 1
-  tsplit[ncc_fail==TRUE, ncc_pr := 1]
+# cases have probability of inclusion of 1 (comment this out, we still want
+# the probability that they were ever included as a control)
+#  tsplit[ncc_fail==TRUE, ncc_pr := 1]
   # if risk sets are smaller than requested number of cases, the calculated
 # probability will be greater than 1. The correct value is 1.
   tsplit[ncc_pr > 1, ncc_pr := 1]
   # we no longer need the number of failures per set
-  tsplit[, nfail := NULL] 
+  #tsplit[, nfail := NULL] 
   
 # sample controls from risk sets  
   if (!silent) {
