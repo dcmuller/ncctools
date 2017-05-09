@@ -24,7 +24,6 @@
 #' to the screen as each risk set is generated. If TRUE, output to the
 #' console is suppressed.
 #' 
-#' @details
 #' @return
 #' A \code{data.frame} comprising the original data, with a variable indicating
 #' the probability of being selected in the nested case control sample (ncc_pr)

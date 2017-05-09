@@ -17,3 +17,6 @@ Imports:
 License: BSD
 Collate:
     'ncc_sample.r'
+    'ncc_selection_prob.r'
+    'ncc_eligible_controls.r'
+RoxygenNote: 6.0.1
