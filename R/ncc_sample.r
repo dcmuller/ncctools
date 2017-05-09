@@ -79,7 +79,7 @@ ncc_sample <- function(entry = 0, exit, fail, origin = 0, controls = 1,
   ncc_id <- 1:n
 # add this id to the supplied data frame for later merging
   data <- data.table(data)
-  data[, "ncc_id" := ncc_id, with=FALSE]
+  data[, "ncc_id" := ncc_id]
   if (length(exit) != n) {
     stop("All vectors must have length")
   }
@@ -220,7 +220,7 @@ ncc_sample <- function(entry = 0, exit, fail, origin = 0, controls = 1,
   # (logical var for case status might confuse people)
   ncc_frame[, ncc_fail := as.numeric(ncc_fail)]
   # get rid of the interim variables
-  ncc_frame[, c("ncc_elig_co", "r1", "r2", "ncc_no_fail", 
+  ncc_frame[, c("r1", "r2", "ncc_no_fail", 
                 "nca", "nel", "nco") := NULL]
   
   # merge ncc frame with original data
