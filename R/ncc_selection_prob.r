@@ -139,6 +139,7 @@ ncc_selection_prob <- function(entry = 0, exit, fail, origin = 0, controls = 1,
   tsplit[, "pr_not" := 1 - ((nfail * controls) / ncc_elig_co)]
   tsplit[, "ncc_pr" := 1- prod(pr_not), by=ncc_id]
   tsplit[, "pr_not" := NULL]
+  tsplit[, "ncc_elig_co" := NULL]
 # cases have probability of inclusion of 1 (comment this out, we still want
 # the probability that they were ever included as a control)
 #  tsplit[ncc_fail==TRUE, ncc_pr := 1]
@@ -150,17 +151,12 @@ ncc_selection_prob <- function(entry = 0, exit, fail, origin = 0, controls = 1,
   
   ncc_frame <- tsplit[, head(.SD, 1), by = list(ncc_id)]
   
-  # coerce failure flag to numeric 
-  # (logical var for case status might confuse people)
-  ncc_frame[, ncc_fail := as.numeric(ncc_fail)]
+  ncc_frame[, ncc_fail := NULL]
   
   # merge ncc frame with original data
   setkey(ncc_frame, ncc_id)
   setkey(data, ncc_id)
   res <- data[ncc_frame]
-#  res <- res[, c(names(ncc_frame), match_names), with=FALSE]
-  res <- res[order(ncc_set,-ncc_fail), ]
-  setkey(res, ncc_set)
   
   return(res)
 }
