@@ -151,17 +151,12 @@ ncc_selection_prob <- function(entry = 0, exit, fail, origin = 0, controls = 1,
   
   ncc_frame <- tsplit[, head(.SD, 1), by = list(ncc_id)]
   
-  # coerce failure flag to numeric 
-  # (logical var for case status might confuse people)
-  ncc_frame[, ncc_fail := as.numeric(ncc_fail)]
+  ncc_frame[, ncc_fail := NULL]
   
   # merge ncc frame with original data
   setkey(ncc_frame, ncc_id)
   setkey(data, ncc_id)
   res <- data[ncc_frame]
-#  res <- res[, c(names(ncc_frame), match_names), with=FALSE]
-  res <- res[order(ncc_set,-ncc_fail), ]
-  setkey(res, ncc_set)
   
   return(res)
 }
