@@ -139,6 +139,7 @@ ncc_selection_prob <- function(entry = 0, exit, fail, origin = 0, controls = 1,
   tsplit[, "pr_not" := 1 - ((nfail * controls) / ncc_elig_co)]
   tsplit[, "ncc_pr" := 1- prod(pr_not), by=ncc_id]
   tsplit[, "pr_not" := NULL]
+  tsplit[, "ncc_elig_co" := NULL]
 # cases have probability of inclusion of 1 (comment this out, we still want
 # the probability that they were ever included as a control)
 #  tsplit[ncc_fail==TRUE, ncc_pr := 1]
